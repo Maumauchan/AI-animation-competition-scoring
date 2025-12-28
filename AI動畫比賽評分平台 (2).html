@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI動畫比賽評分平台</title>
+    <style>
+        :root {
+            --color-primary: #208090;
+            --color-primary-hover: #1a6b78;
+            --color-primary-active: #154f56;
+            --color-surface: #fcfcf9;
+            --color-text: #134252;
+            --color-text-secondary: #626c71;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-bg-success: rgba(33, 128, 141, 0.08);
+            --color-success: #208090;
+            --color-error: #c01535;
+            --color-warning: #a84b2f;
+            --radius-base: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 14px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--color-text);
+            background-color: var(--color-surface);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+            color: white;
+            padding: 30px 20px;
+            border-radius: var(--radius-base);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--color-text);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--color-text);
+            background-color: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(32, 128, 144, 0.1);
+        }
+
+        .scoring-section {
+            background: #f9f9f7;
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+
+        .scoring-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: var(--color-text);
+        }
+
+        .scoring-subtitle {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .score-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .score-btn {
+            padding: 10px 12px;
+            border: 2px solid var(--color-border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 200ms ease;
+            color: var(--color-text);
+        }
+
+        .score-btn:hover {
+            border-color: var(--color-primary);
+            background: rgba(32, 128, 144, 0.05);
+        }
+
+        .score-btn.selected {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .score-description {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            padding: 8px 10px;
+            background: white;
+            border-radius: 4px;
+            line-height: 1.4;
+            margin-top: 8px;
+        }
+
+        .score-display {
+            text-align: right;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-top: 8px;
+        }
+
+        .summary-box {
+            background: var(--color-bg-success);
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-base);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 15px 0;
+            color: var(--color-primary);
+            font-size: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .summary-item-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .summary-item-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--color-primary-active);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: #f9f9f7;
+        }
+
+        .feedback-box {
+            margin-top: 16px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .success-message {
+            display: none;
+            background: var(--color-bg-success);
+            border: 1px solid var(--color-success);
+            color: var(--color-success);
+            padding: 16px;
+            border-radius: var(--radius-base);
+            margin-bottom: 20px;
+        }
+
+        .success-message.show {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .total-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .score-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            header h1 {
+                font-size: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 AI動畫比賽評分平台</h1>
+            <p>長者生命故事主題 • 中學生組別</p>
+        </header>
+
+        <div class="success-message" id="successMessage">
+            ✓ 評分已成功提交！
+        </div>
+
+        <form id="scoringForm">
+            <!-- 基本信息 -->
+            <div class="form-section">
+                <h2 class="section-title">評審資訊</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reviewerName">評審人姓名 *</label>
+                        <input type="text" id="reviewerName" name="reviewerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewerEmail">評審人電郵 *</label>
+                        <input type="email" id="reviewerEmail" name="reviewerEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="submissionNumber">作品編號 *</label>
+                        <input type="text" id="submissionNumber" name="submissionNumber" placeholder="例如: A001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentName">參賽學生姓名</label>
+                        <input type="text" id="studentName" name="studentName">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="evaluationDate">評審日期 *</label>
+                        <input type="date" id="evaluationDate" name="evaluationDate" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 評分項目 -->
+            <div class="form-section">
+                <h2 class="section-title">評分標準</h2>
+
+                <!-- 一、主題掌握與生命故事 -->
+                <div class="scoring-section">
+                    <div class="scoring-title">一、主題掌握與生命故事 (滿分30分)</div>
+                    <div class="scoring-subtitle">評估長者故事呈現的完整性、人生價值觀與尊重程度</div>
+                    
+                    <div class="score-options">
+                        <button type="button" class="score-btn" data-score="1" data-category="category1">27-30分</button>
+                        <button type="button" class="score-btn" data-score="2" data-category="category1">21-26分</button>
+                        <button type="button" class="score-btn" data-score="3" data-category="category1">15-20分</button>
+                        <button type="button" class="score-btn" data-score="4" data-category="category1">0-14分</button>
+                    </div>
+                    
+                    <div class="score-description" id="desc1"></div>
+                    <div class="score-display" id="display1">未評分</div>
+                    <input type="hidden" id="score1" name="score1" value="">
+                </div>
+
+                <!-- 二、故事結構與敘事能力 -->
+                <div class="scoring-section">
+                    <div class="scoring-title">二、故事結構與敘事能力 (滿分25分)</div>
+                    <div class="scoring-subtitle">評估故事框架、節奏掌控與敘事清晰度</div>
+                    
+                    <div class="score-options">
+                        <button type="button" class="score-btn" data-score="1" data-category="category2">23-25分</button>
+                        <button type="button" class="score-btn" data-score="2" data-category="category2">18-22分</button>
+                        <button type="button" class="score-btn" data-score="3" data-category="category2">13-17分</button>
+                        <button type="button" class="score-btn" data-score="4" data-category="category2">0-12分</button>
+                    </div>
+                    
+                    <div class="score-description" id="desc2"></div>
+                    <div class="score-display" id="display2">未評分</div>
+                    <input type="hidden" id="score2" name="score2" value="">
+                </div>
+
+                <!-- 三、AI應用與創意表現 -->
+                <div class="scoring-section">
+                    <div class="scoring-title">三、AI應用與創意表現 (滿分20分)</div>
+                    <div class="scoring-subtitle">評估AI工具使用程度、服務故事能力與整體創意</div>
+                    
+                    <div class="score-options">
+                        <button type="button" class="score-btn" data-score="1" data-category="category3">18-20分</button>
+                        <button type="button" class="score-btn" data-score="2" data-category="category3">14-17分</button>
+                        <button type="button" class="score-btn" data-score="3" data-category="category3">10-13分</button>
+                        <button type="button" class="score-btn" data-score="4" data-category="category3">0-9分</button>
+                    </div>
+                    
+                    <div class="score-description" id="desc3"></div>
+                    <div class="score-display" id="display3">未評分</div>
+                    <input type="hidden" id="score3" name="score3" value="">
+                </div>
+
+                <!-- 四、動畫製作與視聽效果 -->
+                <div class="scoring-section">
+                    <div class="scoring-title">四、動畫製作與視聽效果 (滿分15分)</div>
+                    <div class="scoring-subtitle">分三小項評估：畫面流暢度、視覺美感、聲音設計</div>
+                    
+                    <!-- 畫面與動畫流暢度 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px; color: var(--color-text);">4a. 畫面與動畫流暢度 (5分)</div>
+                        <div class="score-options">
+                            <button type="button" class="score-btn" data-score="1" data-category="category4a">5分</button>
+                            <button type="button" class="score-btn" data-score="2" data-category="category4a">3-4分</button>
+                            <button type="button" class="score-btn" data-score="3" data-category="category4a">0-2分</button>
+                        </div>
+                        <div class="score-description" id="desc4a"></div>
+                        <div class="score-display" id="display4a">未評分</div>
+                        <input type="hidden" id="score4a" name="score4a" value="">
+                    </div>
+
+                    <!-- 視覺設計與美感 -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px; color: var(--color-text);">4b. 視覺設計與美感 (5分)</div>
+                        <div class="score-options">
+                            <button type="button" class="score-btn" data-score="1" data-category="category4b">5分</button>
+                            <button type="button" class="score-btn" data-score="2" data-category="category4b">3-4分</button>
+                            <button type="button" class="score-btn" data-score="3" data-category="category4b">0-2分</button>
+                        </div>
+                        <div class="score-description" id="desc4b"></div>
+                        <div class="score-display" id="display4b">未評分</div>
+                        <input type="hidden" id="score4b" name="score4b" value="">
+                    </div>
+
+                    <!-- 聲音與節奏掌控 -->
+                    <div>
+                        <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px; color: var(--color-text);">4c. 聲音與節奏掌控 (5分)</div>
+                        <div class="score-options">
+                            <button type="button" class="score-btn" data-score="1" data-category="category4c">5分</button>
+                            <button type="button" class="score-btn" data-score="2" data-category="category4c">3-4分</button>
+                            <button type="button" class="score-btn" data-score="3" data-category="category4c">0-2分</button>
+                        </div>
+                        <div class="score-description" id="desc4c"></div>
+                        <div class="score-display" id="display4c">未評分</div>
+                        <input type="hidden" id="score4c" name="score4c" value="">
+                    </div>
+                </div>
+
+                <!-- 五、整體感染力與觀後印象 -->
+                <div class="scoring-section">
+                    <div class="scoring-title">五、整體感染力與觀後印象 (滿分10分)</div>
+                    <div class="scoring-subtitle">評估情感表達與觀眾思考引發程度</div>
+                    
+                    <div class="score-options">
+                        <button type="button" class="score-btn" data-score="1" data-category="category5">9-10分</button>
+                        <button type="button" class="score-btn" data-score="2" data-category="category5">7-8分</button>
+                        <button type="button" class="score-btn" data-score="3" data-category="category5">5-6分</button>
+                        <button type="button" class="score-btn" data-score="4" data-category="category5">0-4分</button>
+                    </div>
+                    
+                    <div class="score-description" id="desc5"></div>
+                    <div class="score-display" id="display5">未評分</div>
+                    <input type="hidden" id="score5" name="score5" value="">
+                </div>
+            </div>
+
+            <!-- 評分摘要 -->
+            <div class="summary-box">
+                <h3>評分摘要</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-item-label">主題掌握</div>
+                        <div class="summary-item-value" id="summary1">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-label">故事結構</div>
+                        <div class="summary-item-value" id="summary2">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-label">AI創意</div>
+                        <div class="summary-item-value" id="summary3">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-label">製作視聽</div>
+                        <div class="summary-item-value" id="summary4">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-label">感染力</div>
+                        <div class="summary-item-value" id="summary5">-</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-item-label">總分</div>
+                        <div class="summary-item-value total-score" id="summaryTotal">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 評審意見 -->
+            <div class="form-section">
+                <h2 class="section-title">評審意見與建議</h2>
+                <div class="form-group feedback-box">
+                    <label for="feedback">評審評語 (選填)</label>
+                    <textarea id="feedback" name="feedback" placeholder="請分享對此作品的評論、優點與改進建議..."></textarea>
+                </div>
+            </div>
+
+            <!-- 提交按鈕 -->
+            <div class="button-group">
+                <button type="reset" class="btn-secondary">清除</button>
+                <button type="submit" class="btn-primary">提交評分</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const scoreDescriptions = {
+            category1: {
+                1: "故事清晰完整，涵蓋多個人生階段（童年、工作、家庭等），長者價值觀與性格特質鮮明突出，調性尊重溫暖",
+                2: "故事基本清楚，2-3個重要階段呈現完整，長者特質有所表現，調性恰當",
+                3: "故事框架可辨識但細節不足，只涉及1-2個階段，長者形象較平面",
+                4: "故事零散難懂，缺乏連貫性，長者形象不清或有不尊重之處"
+            },
+            category2: {
+                1: "結構完整，開頭清楚交代人物背景，中段事件排列有邏輯，結尾有總結或餘韻；節奏流暢；敘事語言清晰凝練",
+                2: "結構基本完整，開頭交代清楚，中段連貫，結尾略倉促；節奏大致恰當；語言基本清楚",
+                3: "結構雛形可見但不穩固，某段略零散或冗長；語言有不清處",
+                4: "結構混亂，事件順序無邏輯，語言晦澀或不連貫"
+            },
+            category3: {
+                1: "明確運用2種以上AI工具，整合自然；AI用途清楚服務故事；整體構想新穎獨特",
+                2: "運用1-2種AI工具，基本有效；AI大多服務故事；構想有一定創意",
+                3: "可見AI工具使用但不突出，或與故事關聯鬆散；構想較平常",
+                4: "無明確AI應用跡象，或AI工具使用不當；缺乏創新"
+            },
+            category4a: {
+                1: "角色動作自然流暢，場景轉換無卡頓，鏡頭推拉/旋轉平穩",
+                2: "基本流暢，少數轉場略生硬但不影響觀看",
+                3: "頻繁卡頓或動作僵硬，觀看不舒適"
+            },
+            category4b: {
+                1: "構圖平衡、色彩溫暖和諧（如懷舊色調），光影自然營造氛圍",
+                2: "顏色一致、構圖得體但光影單調",
+                3: "顏色刺眼或不協調，畫面擁擠"
+            },
+            category4c: {
+                1: "配音清晰情感豐富，音效/音樂精準同步，音量平衡",
+                2: "聲音清楚但同步略偏移",
+                3: "噪音明顯或音樂蓋過對白，節奏亂"
+            },
+            category5: {
+                1: "情感表達有力，觀眾能深切感受長者故事；引發對生命、家庭、價值的思考；印象深刻",
+                2: "故事呈現恰當，觀眾有基本共鳴；引發一定思考",
+                3: "故事傳達清楚但情感層次淺；印象一般",
+                4: "無法引起共鳴，淪為資訊羅列"
+            }
+        };
+
+        const scoreValues = {
+            category1: { 1: 28, 2: 23, 3: 17, 4: 7 },
+            category2: { 1: 24, 2: 20, 3: 15, 4: 6 },
+            category3: { 1: 19, 2: 15, 3: 11, 4: 4 },
+            category4a: { 1: 5, 2: 3, 3: 1 },
+            category4b: { 1: 5, 2: 3, 3: 1 },
+            category4c: { 1: 5, 2: 3, 3: 1 },
+            category5: { 1: 9, 2: 7, 3: 5, 4: 2 }
+        };
+
+        const summaryMap = {
+            category1: 'summary1',
+            category2: 'summary2',
+            category3: 'summary3',
+            category4a: 'summary4',
+            category4b: 'summary4',
+            category4c: 'summary4',
+            category5: 'summary5'
+        };
+
+        document.querySelectorAll('.score-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const category = this.dataset.category;
+                const score = this.dataset.score;
+
+                // 更新按鈕選中狀態
+                document.querySelectorAll(`[data-category="${category}"]`).forEach(b => {
+                    b.classList.remove('selected');
+                });
+                this.classList.add('selected');
+
+                // 更新描述
+                const descId = `desc${category.replace('category', '')}`;
+                const displayId = `display${category.replace('category', '')}`;
+                const inputId = `score${category.replace('category', '')}`;
+
+                const desc = scoreDescriptions[category][score];
+                const value = scoreValues[category][score];
+
+                document.getElementById(descId).textContent = desc;
+                document.getElementById(displayId).textContent = value + '分';
+                document.getElementById(inputId).value = value;
+
+                // 更新摘要
+                updateSummary();
+            });
+        });
+
+        function updateSummary() {
+            const score1 = parseInt(document.getElementById('score1').value) || 0;
+            const score2 = parseInt(document.getElementById('score2').value) || 0;
+            const score3 = parseInt(document.getElementById('score3').value) || 0;
+            const score4a = parseInt(document.getElementById('score4a').value) || 0;
+            const score4b = parseInt(document.getElementById('score4b').value) || 0;
+            const score4c = parseInt(document.getElementById('score4c').value) || 0;
+            const score5 = parseInt(document.getElementById('score5').value) || 0;
+
+            const score4 = score4a + score4b + score4c;
+
+            document.getElementById('summary1').textContent = score1 || '-';
+            document.getElementById('summary2').textContent = score2 || '-';
+            document.getElementById('summary3').textContent = score3 || '-';
+            document.getElementById('summary4').textContent = score4 || '-';
+            document.getElementById('summary5').textContent = score5 || '-';
+
+            const total = score1 + score2 + score3 + score4 + score5;
+            document.getElementById('summaryTotal').textContent = total || '-';
+        }
+
+        document.getElementById('scoringForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const reviewerName = document.getElementById('reviewerName').value;
+            const submissionNumber = document.getElementById('submissionNumber').value;
+
+            if (!reviewerName || !submissionNumber) {
+                alert('請填寫評審人姓名和作品編號');
+                return;
+            }
+
+            const total = parseInt(document.getElementById('summaryTotal').textContent);
+            if (total === 0 || isNaN(total)) {
+                alert('請完成所有評分項目');
+                return;
+            }
+
+            // 顯示成功信息
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.add('show');
+
+            // 準備提交數據
+            const formData = {
+                reviewer: reviewerName,
+                email: document.getElementById('reviewerEmail').value,
+                submission: submissionNumber,
+                student: document.getElementById('studentName').value,
+                date: document.getElementById('evaluationDate').value,
+                scores: {
+                    topic: parseInt(document.getElementById('score1').value),
+                    narrative: parseInt(document.getElementById('score2').value),
+                    aiCreativity: parseInt(document.getElementById('score3').value),
+                    animationFlow: parseInt(document.getElementById('score4a').value),
+                    visualDesign: parseInt(document.getElementById('score4b').value),
+                    audioSound: parseInt(document.getElementById('score4c').value),
+                    impact: parseInt(document.getElementById('score5').value)
+                },
+                total: total,
+                feedback: document.getElementById('feedback').value
+            };
+
+            console.log('提交數據:', formData);
+
+            // 2秒後隱藏成功信息
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        });
+
+        // 初始化日期為今天
+        document.getElementById('evaluationDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
